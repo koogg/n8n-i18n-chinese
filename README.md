@@ -1,3 +1,6 @@
+# 说明
+原项目fork自 https://github.com/other-blowsnow/n8n-i18n-chinese
+因不更新了，为方便自己使用，所以按照自己需求重新改写。
 
 # n8n 简体中文语言包
 
@@ -12,6 +15,11 @@
 3. 用解压后的 `dist` 替换本地 n8n 安装中的 `n8n-editor-ui/dist` 目录。
 4. 设置 n8n 环境变量 `N8N_DEFAULT_LOCALE=zh-CN`。
 5. 重启 n8n。
+6. docker compose使用方式
+变量里添加
+N8N_DEFAULT_LOCALE=zh-CN
+卷映射添加
+[替换为下载的编辑器UI目录]:/usr/local/lib/node_modules/n8n/node_modules/n8n-editor-ui/dist
 
 ## 自动运行
 
@@ -84,7 +92,3 @@ OPENAI_API_CONCURRENT=5
 
 # 参考 n8n 官方 i18n 介绍
 https://github.com/n8n-io/n8n/blob/master/packages/frontend/%40n8n/i18n/docs/README.md
-
-# n8n 语言环境变量
-
-N8N_DEFAULT_LOCALE=zh-CN
