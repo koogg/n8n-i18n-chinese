@@ -23,13 +23,14 @@
 每次运行会：
 
 1. 获取 n8n 最新 Release 版本。
-2. 检查该版本是否已经发布过对应 tag。
-3. 翻译新增或变更的英文文本。
-4. 下载对应版本的 n8n 源码并构建 Editor UI。
-5. 生成 `editor-ui.tar.gz`。
-6. 创建 Git tag 和 GitHub Release，并上传压缩包。
+2. 每次从 n8n `master` 分支拉取最新英文语言包。
+3. 增量翻译新增或变更的英文文本，并自动提交语言包。
+4. 检查最新 Release 是否已经发布过对应 tag。
+5. 只有发现新 Release 时，才下载对应版本的 n8n 源码并构建 Editor UI。
+6. 生成 `editor-ui.tar.gz`。
+7. 创建 GitHub Release，并上传压缩包。
 
-如果对应版本的 tag 已存在，workflow 会直接停止，不重复构建。
+如果对应版本的 tag 已存在，workflow 只同步和翻译 `master` 的新文本，不重复构建 Editor UI。
 
 ## GitHub 配置
 
