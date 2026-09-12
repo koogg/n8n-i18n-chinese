@@ -22,7 +22,7 @@ jobs:
     - name: Get latest N8N release version
       id: latest_release
       run: |
-         LATEST_VERSION=$(curl -s https://api.github.com/repos/n8n-io/n8n/releases/latest | jq -r '.tag_name')
+        LATEST_VERSION=$(curl -s https://api.github.com/repos/n8n-io/n8n/releases/latest | jq -r '.tag_name')
         echo "Latest release tag: $LATEST_VERSION"
         echo "latest=$LATEST_VERSION" >> $GITHUB_OUTPUT
 
@@ -79,9 +79,9 @@ jobs:
       run: |
         git config --global user.name "github-actions"
         git config --global user.email "github-actions@github.com"
-        
+
         git add languages/* script/en.json || true
-        
+
         # 如果没有变更就跳过
         if git diff --cached --quiet; then
           echo "No changes to commit."
@@ -128,7 +128,7 @@ jobs:
 
     - name: Move editor-ui i18n language
       if: steps.check_tag.outputs.exists == 'false'
-      run:     cp -r /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n-i18n-chinese/languages/* "/home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n/packages/frontend/@n8n/i18n/src/locales/"
+      run: cp -r /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n-i18n-chinese/languages/* "/home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n/packages/frontend/@n8n/i18n/src/locales/"
 
     - name: Patch I18n zhCn
       if: steps.editorui_dir.outputs.flag == 'new' && steps.check_tag.outputs.exists == 'false'
