@@ -133,7 +133,27 @@ jobs:
     - name: Patch I18n zhCn
       if: steps.editorui_dir.outputs.flag == 'new' && steps.check_tag.outputs.exists == 'false'
       run: |
-        git apply /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n-i18n-chinese/patches/feat__i18n_zhCn.patch
+        node <<'NODE'
+        const fs = require('fs');
+        const file = '/home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n/packages/frontend/@n8n/i18n/src/index.ts';
+        let source = fs.readFileSync(file, 'utf8');
+        const replacements = [
+          [
+            "import englishBaseText from './locales/en.json';",
+            "import englishBaseText from './locales/en.json';\nimport cnBaseText from './locales/zh-CN.json';",
+          ],
+          ["locale: 'en',", "locale: 'zh-CN',"],
+          [
+            'messages: { en: englishBaseText },',
+            "messages: { en: englishBaseText, 'zh-CN': cnBaseText },",
+          ],
+        ];
+        for (const [from, to] of replacements) {
+          if (!source.includes(from)) throw new Error(`未找到补丁目标: ${from}`);
+          source = source.replace(from, to);
+        }
+        fs.writeFileSync(file, source);
+        NODE
         echo "==== /packages/frontend/@n8n/i18n/src/index.ts 内容 ===="
         head -n 30 /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n/packages/frontend/@n8n/i18n/src/index.ts
       working-directory: /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n
