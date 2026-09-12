@@ -1,0 +1,172 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: package editor-ui languages
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+  - cron: "0 * * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: test
+    strategy:
+      matrix:
+        node-version: [22.x]
+    steps:
+    - name: Get latest N8N release version
+      id: latest_release
+      run: |
+         LATEST_VERSION=$(curl -s https://api.github.com/repos/n8n-io/n8n/releases/latest | jq -r '.tag_name')
+        echo "Latest release tag: $LATEST_VERSION"
+        echo "latest=$LATEST_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Install pnpm
+      run: npm install -g pnpm@10
+
+    - name: Checkout local
+      uses: actions/checkout@v4
+      with:
+        path: ./n8n-i18n-chinese
+
+    # - name: Read version from package.json
+    #   id: get_version
+    #   run: |
+    #     VERSION=$(jq -r '.version' package.json)
+    #     echo "Version: $VERSION"
+    #     echo "version=$VERSION" >> $GITHUB_OUTPUT
+    #   working-directory: /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n
+
+    - name: Check if tag exists
+      id: check_tag
+      run: |
+        TAG="${{ steps.latest_release.outputs.latest }}"
+        echo "Checking for remote tag: $TAG"
+        if git ls-remote --tags origin | grep "refs/tags/$TAG$"; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+      working-directory: /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n-i18n-chinese
+
+    - name: Exit if tags exist
+      if: steps.check_tag.outputs.exists == 'true'
+      run: |
+        echo "Tags exist, stopping workflow."
+
+    - name: Translate New Strings
+      if: steps.check_tag.outputs.exists == 'false'
+      run: |
+        pnpm install
+        cd script
+        node translate.js
+      working-directory: /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n-i18n-chinese
+      env:
+         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+         OPENAI_API_BASE: ${{ vars.OPENAI_API_BASE }}
+         OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+         OPENAI_API_BATCH_SIZE: ${{ vars.OPENAI_API_BATCH_SIZE }}
+         OPENAI_API_CONCURRENT: ${{ vars.OPENAI_API_CONCURRENT }}
+         N8N_I18N_SOURCE_REF: ${{ steps.latest_release.outputs.latest }}
+
+    - name: Translate Publish Git
+      if: steps.check_tag.outputs.exists == 'false'
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+        
+        git add languages/* script/en.json || true
+        
+        # 如果没有变更就跳过
+        if git diff --cached --quiet; then
+          echo "No changes to commit."
+        else
+          git commit -m "chore: auto translate"
+          git push origin
+        fi
+      working-directory: /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n-i18n-chinese
+
+    - name: Checkout n8n
+      if: steps.check_tag.outputs.exists == 'false'
+      uses: actions/checkout@v4
+      with:
+        repository: n8n-io/n8n
+        ref: ${{ steps.latest_release.outputs.latest }}
+        path: ./n8n
+
+    - uses: actions/setup-node@v4.2.0
+      if: steps.check_tag.outputs.exists == 'false'
+      with:
+        node-version: 22.x
+
+    - name: Set pnpm resolution mode
+      if: steps.check_tag.outputs.exists == 'false'
+      run: echo "resolution-mode=highest" >> /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n/.npmrc
+
+    - run: pnpm install --frozen-lockfile
+      if: steps.check_tag.outputs.exists == 'false'
+      working-directory: /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n
+
+    - name: check n8n editor-ui is old
+      id: editorui_dir
+      run: |
+        DIR_PATH="/home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n/packages/frontend/editor-ui"       # 你要检查的目录
+        FALLBACK_DIR="/home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n/packages/editor-ui" # 备用目录
+
+        if [ -d "$DIR_PATH" ]; then
+          echo "flag=new" >> $GITHUB_OUTPUT
+          echo "dir=$DIR_PATH" >> $GITHUB_OUTPUT
+        else
+          echo "flag=old" >> $GITHUB_OUTPUT
+          echo "dir=$FALLBACK_DIR" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Move editor-ui i18n language
+      if: steps.check_tag.outputs.exists == 'false'
+      run:     cp -r /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n-i18n-chinese/languages/* "/home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n/packages/frontend/@n8n/i18n/src/locales/"
+
+    - name: Patch I18n zhCn
+      if: steps.editorui_dir.outputs.flag == 'new' && steps.check_tag.outputs.exists == 'false'
+      run: |
+        git apply /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n-i18n-chinese/patches/feat__i18n_zhCn.patch
+        echo "==== /packages/frontend/@n8n/i18n/src/index.ts 内容 ===="
+        head -n 30 /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n/packages/frontend/@n8n/i18n/src/index.ts
+      working-directory: /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n
+
+    - name: Pnpm build editor-ui
+      if: steps.check_tag.outputs.exists == 'false'
+      run: |
+        pnpm run build:n8n || echo "构建失败，重新检测是否成功"
+        if [ -d "/home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n/packages/frontend/editor-ui/dist" ]; then
+          echo "n8n-editor-ui:build 存在，构建成功"
+        else
+          echo "n8n-editor-ui:build 不存在，构建失败"
+          exit 1
+        fi
+      working-directory: /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n
+
+    - name: 打包 dist 产物
+      if: steps.check_tag.outputs.exists == 'false'
+      run: |
+        tar -czvf editor-ui.tar.gz dist
+      working-directory: ${{ steps.editorui_dir.outputs.dir }}
+
+    - name: 创建 GitHub Release
+      if: steps.check_tag.outputs.exists == 'false'
+      id: create_release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.latest_release.outputs.latest }}
+        name: Release editor-ui to ${{ steps.latest_release.outputs.latest }}
+        body: |
+          自动发布的中文语言包版本。
+        draft: false
+        prerelease: false
+        files: ${{ steps.editorui_dir.outputs.dir }}/editor-ui.tar.gz
+      env:
+        GITHUB_TOKEN: ${{ github.token }}

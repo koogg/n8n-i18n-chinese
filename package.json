@@ -1,0 +1,23 @@
+{
+  "name": "n8n-i18n-chinese",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "i18n:translate": "node ./script/translate.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/other-blowsnow/n8n-i18n-chinese.git"
+  },
+  "private": true,
+  "devDependencies": {
+    "dotenv": "^16.4.7",
+    "n8n-nodes-base": "latest",
+    "qs": "latest"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "p-limit": "^2.3.0"
+  }
+}

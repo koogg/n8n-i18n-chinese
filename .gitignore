@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.example
+node_modules/
+script/en-nodes.json
+editor-ui-dist/
+*.tar.gz
+.idea/

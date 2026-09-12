@@ -1,0 +1,19 @@
+Subject: [PATCH] fix: When translation is needed, the page console prompts null data.
+---
+Index: packages/frontend/editor-ui/src/components/CredentialEdit/CredentialConfig.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/packages/frontend/editor-ui/src/components/CredentialEdit/CredentialConfig.vue b/packages/frontend/editor-ui/src/components/CredentialEdit/CredentialConfig.vue
+--- a/packages/frontend/editor-ui/src/components/CredentialEdit/CredentialConfig.vue	(revision d2dd1796a871ee41681acc44ad01dfb0bbd5eee1)
++++ b/packages/frontend/editor-ui/src/components/CredentialEdit/CredentialConfig.vue	(date 1741319010499)
+@@ -96,6 +96,8 @@
+ 		props.credentialType.name,
+ 	);
+ 
++	if (!credTranslation) return;
++
+ 	addCredentialTranslation(
+ 		{ [props.credentialType.name]: credTranslation },
+ 		rootStore.defaultLocale,
