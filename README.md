@@ -40,6 +40,11 @@ N8N_DEFAULT_LOCALE=zh-CN
 
 如果对应版本的 tag 已存在，workflow 只同步和翻译 `master` 的新文本，不重复构建 Editor UI。
 
+手动运行时可以选择：
+
+- `force_retranslate`：强制重新翻译所有英文文本，会消耗较多 API 额度。
+- `force_build`：忽略已有 Release tag，重新构建并更新当前 Release 的 `editor-ui.tar.gz`。
+
 ## GitHub 配置
 
 在仓库的 `Settings -> Environments -> test` 中配置以下变量。

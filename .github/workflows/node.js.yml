@@ -14,6 +14,17 @@ on:
   schedule:
   - cron: "0 * * * *"
   workflow_dispatch:
+    inputs:
+      force_retranslate:
+        description: "强制重新翻译所有英文文本"
+        required: false
+        default: false
+        type: boolean
+      force_build:
+        description: "忽略已有 Release tag，强制重建并更新 Release"
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build:
@@ -71,6 +82,7 @@ jobs:
          OPENAI_API_BATCH_SIZE: ${{ vars.OPENAI_API_BATCH_SIZE }}
          OPENAI_API_CONCURRENT: ${{ vars.OPENAI_API_CONCURRENT }}
          N8N_I18N_SOURCE_REF: master
+         OPENAI_FORCE_RETRANSLATE: ${{ inputs.force_retranslate || false }}
 
     - name: Translate Publish Git
       run: |
@@ -89,7 +101,7 @@ jobs:
       working-directory: /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n-i18n-chinese
 
     - name: Checkout n8n
-      if: steps.check_tag.outputs.exists == 'false'
+      if: steps.check_tag.outputs.exists == 'false' || inputs.force_build == true
       uses: actions/checkout@v4
       with:
         repository: n8n-io/n8n
@@ -97,20 +109,21 @@ jobs:
         path: ./n8n
 
     - uses: actions/setup-node@v4.2.0
-      if: steps.check_tag.outputs.exists == 'false'
+      if: steps.check_tag.outputs.exists == 'false' || inputs.force_build == true
       with:
         node-version: 24.x
 
     - name: Set pnpm resolution mode
-      if: steps.check_tag.outputs.exists == 'false'
+      if: steps.check_tag.outputs.exists == 'false' || inputs.force_build == true
       run: echo "resolution-mode=highest" >> /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n/.npmrc
 
     - run: pnpm install --frozen-lockfile
-      if: steps.check_tag.outputs.exists == 'false'
+      if: steps.check_tag.outputs.exists == 'false' || inputs.force_build == true
       working-directory: /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n
 
     - name: check n8n editor-ui is old
       id: editorui_dir
+      if: steps.check_tag.outputs.exists == 'false' || inputs.force_build == true
       run: |
         DIR_PATH="/home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n/packages/frontend/editor-ui"       # 你要检查的目录
         FALLBACK_DIR="/home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n/packages/editor-ui" # 备用目录
@@ -124,11 +137,11 @@ jobs:
         fi
 
     - name: Move editor-ui i18n language
-      if: steps.check_tag.outputs.exists == 'false'
+      if: steps.check_tag.outputs.exists == 'false' || inputs.force_build == true
       run: cp -r /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n-i18n-chinese/languages/* "/home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n/packages/frontend/@n8n/i18n/src/locales/"
 
     - name: Patch I18n zhCn
-      if: steps.editorui_dir.outputs.flag == 'new' && steps.check_tag.outputs.exists == 'false'
+      if: (steps.check_tag.outputs.exists == 'false' || inputs.force_build == true) && steps.editorui_dir.outputs.flag == 'new'
       run: |
         node <<'NODE'
         const fs = require('fs');
@@ -156,7 +169,7 @@ jobs:
       working-directory: /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n
 
     - name: Pnpm build editor-ui
-      if: steps.check_tag.outputs.exists == 'false'
+      if: steps.check_tag.outputs.exists == 'false' || inputs.force_build == true
       run: |
         pnpm run build:n8n || echo "构建失败，重新检测是否成功"
         if [ -d "/home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n/packages/frontend/editor-ui/dist" ]; then
@@ -168,13 +181,13 @@ jobs:
       working-directory: /home/runner/work/n8n-i18n-chinese/n8n-i18n-chinese/n8n
 
     - name: 打包 dist 产物
-      if: steps.check_tag.outputs.exists == 'false'
+      if: steps.check_tag.outputs.exists == 'false' || inputs.force_build == true
       run: |
         tar -czvf editor-ui.tar.gz dist
       working-directory: ${{ steps.editorui_dir.outputs.dir }}
 
     - name: 创建 GitHub Release
-      if: steps.check_tag.outputs.exists == 'false'
+      if: steps.check_tag.outputs.exists == 'false' || inputs.force_build == true
       id: create_release
       uses: softprops/action-gh-release@v2
       with:

@@ -178,6 +178,8 @@ async function translate(waitTranslateList, targetObject, targetLanguage) {
 }
 
 function collectMessages(oldSourceLanguages, newSourceLanguages, targetLanguages, parentKey = '', waitTranslateList = []) {
+    const forceRetranslate = process.env.OPENAI_FORCE_RETRANSLATE === 'true';
+
     for (const key in newSourceLanguages) {
         const currentKey = parentKey ? `${parentKey}##${key}` : key;
         if (newSourceLanguages[key] instanceof Object) {
@@ -188,7 +190,7 @@ function collectMessages(oldSourceLanguages, newSourceLanguages, targetLanguages
                 currentKey,
                 waitTranslateList,
             );
-        } else if (
+        } else if (forceRetranslate ||
             targetLanguages[key] === undefined
             || oldSourceLanguages[key] === undefined
             || oldSourceLanguages[key] !== newSourceLanguages[key]
