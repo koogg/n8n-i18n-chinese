@@ -25,7 +25,7 @@ N8N_DEFAULT_LOCALE=zh-CN
 
 自动化由 `.github/workflows/node.js.yml` 完成，触发方式有两种：
 
-- 定时运行：每小时的第 0 分钟运行一次。
+- 定时运行：每2小时的第 0 分钟运行一次。
 - 手动运行：在 GitHub 仓库的 `Actions` 页面选择 `package editor-ui languages`，点击 `Run workflow`。
 
 每次运行会：
