@@ -12,8 +12,7 @@ concurrency:
 
 on:
   schedule:
-  # GitHub Actions 使用 UTC；每天 23:00 UTC 即北京时间次日 07:00
-  - cron: "0 23 * * *"
+  - cron: "0 */2 * * *"
   workflow_dispatch:
     inputs:
       force_retranslate:
