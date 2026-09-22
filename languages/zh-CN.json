@@ -2434,8 +2434,6 @@
     "nodeSettings.nodeVersion": "{node} 节点版本 {version}",
     "typeAvailabilityPolicies.restrictedNode.title": "此节点受限",
     "typeAvailabilityPolicies.restrictedNode.contactAdmin": "联系实例管理员",
-    "typeAvailabilityPolicies.restrictedNode.contactAdmin.description": "实例管理员负责管理哪些节点可用。请联系其中一位，以请求访问“{nodeType}”。",
-    "typeAvailabilityPolicies.restrictedNode.contactAdmin.mailSubject": "请求访问 {nodeType} 节点",
     "typeAvailabilityPolicies.restrictedNode.scope.instance": "在此实例中受限",
     "typeAvailabilityPolicies.restrictedNode.scope.project": "在此项目中受限",
     "typeAvailabilityPolicies.restrictedNode.popover.description": "管理员阻止了此节点。要在工作流中使用它，请联系实例管理员获取访问权限。",
