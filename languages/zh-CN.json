@@ -4792,7 +4792,6 @@
     "workflowSettings.callerIds.placeholder": "例如：14、18",
     "workflowSettings.callerPolicy": "此工作流可由",
     "workflowSettings.callerPolicy.options.any": "任何工作流（已弃用）",
-    "workflowSettings.callerPolicy.any.deprecationNotice": "“任何工作流”已弃用，并将在版本 3 中移除。它允许从此实例上的任何项目调用此工作流，这会绕过项目权限。请在升级前切换到“选定的工作流”或“同一项目”选项，否则这些子工作流调用将失败。",
     "workflowSettings.callerPolicy.options.workflowsFromPersonalProject": "由 {projectName} 创建的工作流",
     "workflowSettings.callerPolicy.options.workflowsFromTeamProject": "仅限 {projectName} 中的工作流",
     "workflowSettings.callerPolicy.options.workflowsFromSameProject": "仅限同一项目中的工作流",
