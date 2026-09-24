@@ -3633,7 +3633,6 @@
     "settings.mcp.refresh.tooltip": "刷新列表",
     "settings.mcp.connectWorkflows": "启用工作流",
     "settings.mcp.connectWorkflows.modalTitle": "启用工作流 MCP 访问权限",
-    "settings.mcp.connectWorkflows.notice": "已发布且包含 Webhook、表单、计划或聊天触发节点之一的工作流可以启用 MCP 访问权限。<a href='{docsLink}' target='_blank'>了解更多</a>",
     "settings.mcp.connectWorkflows.input.placeholder": "搜索要连接的工作流",
     "settings.mcp.connectWorkflows.confirm.label": "启用",
     "settings.mcp.connectWorkflows.error": "获取可用工作流时出错",
