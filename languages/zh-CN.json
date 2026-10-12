@@ -3426,6 +3426,7 @@
     "settings.context.preferences.columns.scope": "范围",
     "settings.context.preferences.columns.createdBy": "创建者",
     "settings.context.preferences.createdBy.withSource": "{name} ({source})",
+    "settings.context.preferences.columns.updatedAt": "最后更新",
     "settings.context.preferences.source.ui": "设置",
     "settings.context.preferences.source.aia": "n8n 助手",
     "settings.context.preferences.source.mcp": "MCP",
