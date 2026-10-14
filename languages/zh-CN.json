@@ -681,6 +681,7 @@
     "chatHub.toolsManager.add": "添加",
     "chatHub.toolsManager.addTool": "添加工具",
     "chatHub.toolsManager.remove": "移除",
+    "chatHub.toolsManager.roleBlocked": "您的角色无法使用此工具。请将其移除，或向管理员申请其他角色。",
     "chatHub.toolsManager.configure": "配置",
     "chatHub.toolsManager.manageTools": "管理工具",
     "chatHub.toolsManager.enableTool": "启用工具",
