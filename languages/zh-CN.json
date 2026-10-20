@@ -3474,7 +3474,7 @@
     "runData.editor.cancel": "取消",
     "runData.editor.copyDataInfo": "你可以从之前的执行记录中复制数据，然后粘贴到上方。",
     "runData.aiContentBlock.model": "由 {model} 回答",
-    "runData.aiContentBlock.model.tooltip": "生成此响应的模型。它可能与节点上设置的模型不同，例如当模型路由器选择它时。",
+    "runData.aiContentBlock.model.tooltip": "提供商返回了此模型名称。该名称可能与节点上设置的模型不同，例如由模型路由器选择时。",
     "runData.aiContentBlock.startedAt": "开始时间：{startTime}",
     "runData.aiContentBlock.tokens": "{count} 个令牌",
     "runData.aiContentBlock.tokens.prompt": "提示词：",
